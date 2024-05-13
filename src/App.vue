@@ -1,149 +1,135 @@
-<script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+<template>
+  <div class="container">
+    <header>
+      <nav>
+        <ul>
+          <li @click="selectedMenu = 'Post'" :class="{ active: selectedMenu === 'Post' }">Post</li>
+          <li @click="selectedMenu = 'Todos'" :class="{ active: selectedMenu === 'Todos' }">Todos</li>
+        </ul>
+      </nav>
+    </header>
+    <div class="content">
+      <div v-if="selectedMenu === 'Post'" class="post-section">
+        <select v-model="selectedUser" @change="fetchPosts">
+          <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
+        </select>
+        <div v-if="loadingPosts">
+          <p>Loading...</p>
+        </div>
+        <div v-else-if="posts.length > 0">
+          <h2>Postingan User: {{ selectedUserName }}</h2>
+          <ul>
+            <li v-for="post in posts" :key="post.id">
+              <h3>{{ post.title }}</h3>
+              <p>{{ post.body }}</p>
+            </li>
+          </ul>
+        </div>
+        <div v-else>
+          <p>Tidak ada postingan untuk user ini.</p>
+        </div>
+      </div>
+      <div v-else-if="selectedMenu === 'Todos'" class="todos-section">
+        <Todos :todos="todos" />
+      </div>
+    </div>
+  </div>
+</template>
 
-const todos = ref([])
-const name = ref('')
+<script>
+import Todos from './Todos.vue'; // Sesuaikan dengan path file komponen Todos Anda
 
-const input_content = ref('')
-const input_category = ref(null)
-
-const todos_asc = computed(() => todos.value.sort((a,b) =>{
-	return a.createdAt - b.createdAt
-}))
-
-watch(name, (newVal) => {
-	localStorage.setItem('name', newVal)
-})
-
-watch(todos, (newVal) => {
-	localStorage.setItem('todos', JSON.stringify(newVal))
-}, {
-	deep: true
-})
-
-const addTodo = () => {
-	if (input_content.value.trim() === '' || input_category.value === null) {
-		return
-	}
-
-	todos.value.push({
-		content: input_content.value,
-		category: input_category.value,
-		done: false,
-		editable: false,
-		createdAt: new Date().getTime()
-	})
-}
-
-const removeTodo = (todo) => {
-	todos.value = todos.value.filter((t) => t !== todo)
-}
-
-onMounted(() => {
-	name.value = localStorage.getItem('name') || ''
-	todos.value = JSON.parse(localStorage.getItem('todos')) || []
-})
+export default {
+  components: {
+    Todos
+  },
+  data() {
+    return {
+      selectedMenu: 'Post', // Default menu selection
+      users: [],
+      selectedUser: null,
+      selectedUserName: '',
+      posts: [],
+      todos: [], // Isi dengan data Todos yang telah Anda dapatkan
+      loadingPosts: false,
+      errorPosts: null
+    };
+  },
+  methods: {
+    async fetchUsers() {
+      try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/users');
+        this.users = await response.json();
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    },
+    async fetchPosts() {
+      if (!this.selectedUser) return;
+      this.loadingPosts = true;
+      try {
+        const response = await fetch(`https://jsonplaceholder.typicode.com/posts?userId=${this.selectedUser}`);
+        this.posts = await response.json();
+        const selectedUser = this.users.find(user => user.id === parseInt(this.selectedUser));
+        if (selectedUser) {
+          this.selectedUserName = selectedUser.name;
+        }
+        this.loadingPosts = false;
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+        this.errorPosts = 'Terjadi kesalahan saat mengambil data postingan.';
+        this.loadingPosts = false;
+      }
+    }
+  },
+  watch: {
+    selectedUser() {
+      this.fetchPosts();
+    }
+  },
+  created() {
+    this.fetchUsers();
+  }
+};
 </script>
 
-<template>
-	<main class="app">
-		
-		<section class="greeting">
-			<h2 class="title">
-				What's up, <input type="text" id="name" placeholder="Name here" v-model="name">
-			</h2>
-		</section>
+<style>
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-		<section class="create-todo">
-			<h3>List Kegiatan Hari ini</h3>
+.content {
+  max-width: 800px;
+}
 
-			<form id="new-todo-form" @submit.prevent="addTodo">
-				<h4>What's on your todo list?</h4>
-				<input 
-					type="text" 
-					name="content" 
-					id="content" 
-					placeholder="e.g. make a video"
-					v-model="input_content" />
-				
-				<h4>Pick a category</h4>
-				<div class="options">
+header {
+  background-color: #333;
+  padding: 10px 0;
+}
 
-					<label>
-    <input 
-        type="radio" 
-        name="category" 
-        id="category3" 
-        value="health"
-        v-model="input_category" />
-    <span class="bubble health"></span>
-    <div>Health</div>
-</label>
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
-<label>
-    <input 
-        type="radio" 
-        name="category" 
-        id="category4" 
-        value="education"
-        v-model="input_category" />
-    <span class="bubble education"></span>
-    <div>Education</div>
-</label>
+nav ul li {
+  display: inline-block;
+  margin-right: 20px;
+  color: #fff;
+  cursor: pointer;
+}
 
-<label>
-    <input 
-        type="radio" 
-        name="category" 
-        id="category5" 
-        value="entertainment"
-        v-model="input_category" />
-    <span class="bubble entertainment"></span>
-    <div>Entertainment</div>
-</label>
+nav ul li.active {
+  font-weight: bold;
+}
 
-<label>
-    <input 
-        type="radio" 
-        name="category" 
-        id="category6" 
-        value="other"
-        v-model="input_category" />
-    <span class="bubble other"></span>
-    <div>Other</div>
-</label>
-
-				</div>
-
-				<input type="submit" value="Add todo" />
-			</form>
-		</section>
-
-		<section class="todo-list">
-			<h3>TODO LIST</h3>
-			<div class="list" id="todo-list">
-
-				<div v-for="todo in todos_asc" :class="`todo-item ${todo.done && 'done'}`">
-					<label>
-						<input type="checkbox" v-model="todo.done" />
-						<span :class="`bubble ${
-							todo.category == 'business' 
-								? 'business' 
-								: 'personal'
-						}`"></span>
-					</label>
-
-					<div class="todo-content">
-						<input type="text" v-model="todo.content" />
-					</div>
-
-					<div class="actions">
-						<button class="delete" @click="removeTodo(todo)">Delete</button>
-					</div>
-				</div>
-
-			</div>
-		</section>
-
-	</main>
-</template>
+.post-section,
+.todos-section {
+  margin-top: 20px;
+}
+</style>
