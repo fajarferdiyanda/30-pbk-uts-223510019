@@ -44,6 +44,19 @@ onMounted(() => {
 	todos.value = JSON.parse(localStorage.getItem('todos')) || []
 })
 </script>
+
+
+<script>
+export default {
+  props: {
+    todos: {
+      type: Array,
+      required: true
+    }
+  }
+};
+</script>
+
 <template>
 	<main class="app">
 		
