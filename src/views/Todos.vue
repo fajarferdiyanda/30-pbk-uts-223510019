@@ -44,7 +44,6 @@ onMounted(() => {
 	todos.value = JSON.parse(localStorage.getItem('todos')) || []
 })
 </script>
-
 <template>
 	<main class="app">
 		
@@ -147,3 +146,66 @@ onMounted(() => {
 
 	</main>
 </template>
+
+<style>
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: aqua;
+}
+
+.greeting {
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 20px;
+}
+
+#create-todo {
+  margin-bottom: 20px;
+}
+
+.create-todo,
+.todo-list {
+  width: 100%;
+  max-width: 500px;
+}
+
+.options {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.todo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.todo-item.done {
+  background-color: #d4edda;
+}
+
+.bubble {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.bubble.personal {
+  background-color: #007bff;
+}
+
+.bubble.college {
+  background-color: #ffc107;
+}
+</style>

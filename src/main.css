@@ -1,15 +1,15 @@
 :root {
-	--primary: #EA40A4;
-	--business: #3A82EE;
+	--primary: #ee2805;
+	--business: #cfef00;
 	--personal: var(--primary);
 	--light: #EEE;
-	--grey: #888;
+	--grey: #120308;
 	--dark: #313154;
 	--danger: #ff5b57;
 
 	--shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-	--business-glow: 0px 0px 4px rgba(58, 130, 238, 0.75);
+	--business-glow: 0px 0px 4px rgba(238, 190, 58, 0.75);
 	--personal-glow: 0px 0px 4px rgba(234, 64, 164, 0.75);
 }
 
@@ -29,9 +29,10 @@ input:not([type="radio"]):not([type="checkbox"]), button {
 }
 
 body {
-	background: rgb(156, 200, 234);
-	color: var(--dark);
+    background: rgb(190, 218, 228); /* Change to the desired shade of blue */
+    color: var(--dark);
 }
+
 
 section {
 	margin-top: 2rem;
@@ -45,7 +46,6 @@ h3 {
 	font-size: 1rem;
 	font-weight: 400;
 	margin-bottom: 0.5rem;
-	font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 h4 {
@@ -158,8 +158,8 @@ input:checked ~ .bubble::after {
 	width: 100%;
 	font-size: 1.125rem;
 	padding: 1rem 1.5rem;
-	color: hsl(60, 3%, 6%);
-	background-color: yellow;
+	color: #FFF;
+	background-color: var(--primary);
 	border-radius: 0.5rem;
 	box-shadow: var(--personal-glow);
 	cursor: pointer;
